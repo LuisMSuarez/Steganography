@@ -1,9 +1,11 @@
 #include <iostream>
-#include "bitmap.h"
+#include "steganography.h"
 
-int main(int argc, char **argv)
+steganographyLib::Steganography::Steganography()
 {
-    std::cout << "hello world\r\n";
-    bmp::Bitmap mybitmap("sample.bmp");
-    return 0;
+    std::cout << "Steganography constructor invoked";
+}
+
+steganographyLib::Steganography::~Steganography()
+{
 }
