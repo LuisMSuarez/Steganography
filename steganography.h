@@ -5,7 +5,7 @@ namespace steganographyLib
     class Steganography
     {
         public:
-            Steganography(int x, int y);
+            Steganography();
             ~Steganography();
             void embedInformation();
             void extractInformation();
