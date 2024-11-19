@@ -21,5 +21,6 @@ namespace steganographyLib
             /// @param bitsPerPixel Resolution that determines how many bits from each RGB pixel (24 bits) encodes source data.  Must be a multiple of 3 between 3 and 24. 
             void extract(const std::string &sourceBitmapFilePath, const std::string &destinationDataFilePath, u_int8_t bitsPerPixel);
         private:
+            void encodeByte(const char inputByte, std::vector<Pixel>::iterator &currentPixelIterator, int &inputByteBitEncodingPos, int &pixelBitEncodingPos);                
     };
 }

@@ -5,7 +5,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${fileDirname}/${fileBasenameNoExtension}",
-            "args": ["embed", "bitmapPath", "sourceData", "destinationBitmap", "3"],
+            "args": ["embed", "./data/sample.bmp", "./data/sampleInput.txt", "./data/destinationBitmap.bmp", "3"],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",
             "environment": [],
