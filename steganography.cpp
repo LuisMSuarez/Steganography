@@ -94,16 +94,16 @@ void steganographyLib::Steganography::extract(const std::string &source, const s
 
 void steganographyLib::Steganography::encodeByte(const char inputByte)
 {
-    const u_int8_t ONES_BYTE = 0xFF;
     const u_int8_t LSB_BYTE_MASK = 0x01;
 
     // loop with an index to the bit (0 to 7) that is being encoded from the data file byte
+    // encoding from least significant bit to most significant bit
     for (int inputByteBitEncodingPos = 0; inputByteBitEncodingPos < 8; inputByteBitEncodingPos++)
     {
+        // isolate the bit we are trying to encode on the LSB position of a byte
         uint8_t inputByteBit = LSB_BYTE_MASK & (inputByte >> inputByteBitEncodingPos);
-        uint8_t mask = inputByteBit << inputByteBitEncodingPos;
 
-        // grab a pointer to the RGB component in the current pixel where we will encode
+        // grab a pointer to the RGB component in the current pixel where we will encode the data bits to
         uint8_t* pPixel;
         switch(m_currentPixelColor)
         {
@@ -120,7 +120,20 @@ void steganographyLib::Steganography::encodeByte(const char inputByte)
                 throw runtime_error("Unexpected pixel color during encode operation");
         }
 
-        *pPixel |= mask;
+        // the mask is all zeros with a single bit at the encoding position
+        int8_t mask = inputByteBit << m_pixelBitEncodingPos;
+        if (inputByteBit)
+        {
+            // we encode a '1' bit by performing OR bitwise operation on the pixel byte
+            *pPixel |= mask;
+        }
+        else
+        {
+            // we encode a '0' bit by performing AND bitwise operation on the complement of the mask
+            *pPixel &= ~mask;
+        }
+
+        m_pixelBitEncodingPos++;        
     }
     
     cout << "encodeByte called";
