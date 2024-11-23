@@ -1,7 +1,18 @@
 #pragma once
 
+#include <vector>    // std::vector
+#include <cstdint>   // std::int*_t
+#include "bitmap.h"
+
 namespace steganographyLib
 {
+    enum PixelColor 
+    {
+        R,
+        G,
+        B
+    };
+
     class Steganography
     {
         public:
@@ -21,6 +32,11 @@ namespace steganographyLib
             /// @param bitsPerPixel Resolution that determines how many bits from each RGB pixel (24 bits) encodes source data.  Must be a multiple of 3 between 3 and 24. 
             void extract(const std::string &sourceBitmapFilePath, const std::string &destinationDataFilePath, u_int8_t bitsPerPixel);
         private:
-            void encodeByte(const char inputByte, std::vector<Pixel>::iterator &currentPixelIterator, int &inputByteBitEncodingPos, int &pixelBitEncodingPos);                
+            void encodeByte(const char inputByte);
+            
+            // member variables
+            std::vector<bmp::Pixel>::iterator m_currentPixelIterator;
+            int m_pixelBitEncodingPos;
+            PixelColor m_currentPixelColor;          
     };
 }

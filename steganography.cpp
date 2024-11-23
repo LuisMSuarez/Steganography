@@ -1,7 +1,6 @@
 #include <iostream>  // std::cout
 #include <fstream>   // std::*fstream
 #include "steganography.h"
-#include "bitmap.h"
 
 using namespace std;
 using namespace bmp;
@@ -58,10 +57,12 @@ void steganographyLib::Steganography::embed(const std::string &originalBitmapFil
     // for performance reasons, we read the input in 1K chunks
     vector<char> buffer(1024);
     auto inputStreamExhausted = false;
-    auto currentPixelIterator = sourceBitmap.begin();
-    auto pixelsExhausted = currentPixelIterator != sourceBitmap.end();
-    int inputByteBitEncodingPos = 0; // index to the bit (0 to 7) that is being encoded from the data file byte
-    int pixelBitEncodingPos = 0; // index to the bit (0 to 7) where data will be stored in the current pixel.
+    m_currentPixelIterator = sourceBitmap.begin();
+    auto pixelsExhausted = m_currentPixelIterator != sourceBitmap.end();
+    
+    m_pixelBitEncodingPos = 0; // index to the bit (0 to 7) where data will be stored in the current pixel.
+    m_currentPixelColor = PixelColor::R;
+
     while(!inputStreamExhausted  &&
           !pixelsExhausted)
     {
@@ -72,7 +73,7 @@ void steganographyLib::Steganography::embed(const std::string &originalBitmapFil
         {
             for (streamsize i = 0; i < bytesRead; i++) 
             {
-                encodeByte(buffer[i], currentPixelIterator, inputByteBitEncodingPos, pixelBitEncodingPos);
+                encodeByte(buffer[i]);
                 cout << buffer[i] << " ";
             }
         }
@@ -91,7 +92,36 @@ void steganographyLib::Steganography::extract(const std::string &source, const s
     cout << "extract called";
 }
 
-void steganographyLib::Steganography::encodeByte(const char inputByte, std::vector<Pixel>::iterator &currentPixelIterator, int &inputByteBitEncodingPos, int &pixelBitEncodingPos)
+void steganographyLib::Steganography::encodeByte(const char inputByte)
 {
+    const u_int8_t ONES_BYTE = 0xFF;
+    const u_int8_t LSB_BYTE_MASK = 0x01;
+
+    // loop with an index to the bit (0 to 7) that is being encoded from the data file byte
+    for (int inputByteBitEncodingPos = 0; inputByteBitEncodingPos < 8; inputByteBitEncodingPos++)
+    {
+        uint8_t inputByteBit = LSB_BYTE_MASK & (inputByte >> inputByteBitEncodingPos);
+        uint8_t mask = inputByteBit << inputByteBitEncodingPos;
+
+        // grab a pointer to the RGB component in the current pixel where we will encode
+        uint8_t* pPixel;
+        switch(m_currentPixelColor)
+        {
+            case PixelColor::R:
+                pPixel = &m_currentPixelIterator->r;
+                break;
+            case PixelColor::G:
+                pPixel = &m_currentPixelIterator->g;
+                break;
+            case PixelColor::B:
+                pPixel = &m_currentPixelIterator->b;
+                break;
+            default:
+                throw runtime_error("Unexpected pixel color during encode operation");
+        }
+
+        *pPixel |= mask;
+    }
+    
     cout << "encodeByte called";
 }
