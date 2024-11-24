@@ -17,8 +17,6 @@ steganographyLib::Steganography::~Steganography()
 
 void steganographyLib::Steganography::embed(const std::string &originalBitmapFilePath, const std::string &sourceDataFilePath, const std::string &destinationBitmapDataFilePath, u_int8_t bitsPerPixel)
 {
-    cout << "embed called\n";
-
     // Before manipulating files, verify that bitsPerPixel is a number between 3 and 24 and a multiple of 3.
     // this number represents how many bits of information from the input file we will pack into each 24-bit RGB pixel.
     if (bitsPerPixel < 3 ||
@@ -60,14 +58,13 @@ void steganographyLib::Steganography::embed(const std::string &originalBitmapFil
     vector<char> buffer(1024);
     auto inputStreamExhausted = false;
     m_currentPixelIterator = sourceBitmap.begin();
-    auto pixelsExhausted = m_currentPixelIterator != sourceBitmap.end();
     
     m_pixelBitEncodingPos = 0; // index to the bit (0 to 7) where data will be stored in the current pixel.
     m_currentPixelColor = PixelColor::R;
     m_pPixel = &m_currentPixelIterator->r;
 
     while(!inputStreamExhausted  &&
-          !pixelsExhausted)
+          m_currentPixelIterator != sourceBitmap.end())
     {
         sourceDataFileStream.read(buffer.data(), buffer.size());
         auto bytesRead = sourceDataFileStream.gcount();
@@ -124,7 +121,7 @@ void steganographyLib::Steganography::encodeByte(const char inputByte)
         m_pixelBitEncodingPos++;
 
         // check to see if we need to encode data in the next byte of the bitmap
-        if (m_pixelBitEncodingPos > m_bitsPerPixel)
+        if (m_pixelBitEncodingPos == m_bitsPerPixel)
         {
             nextDestinationByte();
         }        
