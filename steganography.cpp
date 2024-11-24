@@ -28,6 +28,8 @@ void steganographyLib::Steganography::embed(const std::string &originalBitmapFil
         throw runtime_error("Invalid value for parameter bitsPerPixel. Must be a value between 3 and 24 and multiple of 3. Aborting embed operation.");
     }
 
+    m_bitsPerPixel = bitsPerPixel;
+
     // Open and verify sourceDataFilePath
     auto sourceDataFileStream = ifstream(sourceDataFilePath, ios::binary);
     if (!sourceDataFileStream || 
@@ -54,7 +56,7 @@ void steganographyLib::Steganography::embed(const std::string &originalBitmapFil
     }
 
     // perform embed operation
-    // for performance reasons, we read the input in 1K chunks
+    // for performance reasons, we read the input in 1K chunks instead of one byte at a time
     vector<char> buffer(1024);
     auto inputStreamExhausted = false;
     m_currentPixelIterator = sourceBitmap.begin();
@@ -62,6 +64,7 @@ void steganographyLib::Steganography::embed(const std::string &originalBitmapFil
     
     m_pixelBitEncodingPos = 0; // index to the bit (0 to 7) where data will be stored in the current pixel.
     m_currentPixelColor = PixelColor::R;
+    m_pPixel = &m_currentPixelIterator->r;
 
     while(!inputStreamExhausted  &&
           !pixelsExhausted)
@@ -102,39 +105,51 @@ void steganographyLib::Steganography::encodeByte(const char inputByte)
     {
         // isolate the bit we are trying to encode on the LSB position of a byte
         uint8_t inputByteBit = LSB_BYTE_MASK & (inputByte >> inputByteBitEncodingPos);
-
-        // grab a pointer to the RGB component in the current pixel where we will encode the data bits to
-        uint8_t* pPixel;
-        switch(m_currentPixelColor)
-        {
-            case PixelColor::R:
-                pPixel = &m_currentPixelIterator->r;
-                break;
-            case PixelColor::G:
-                pPixel = &m_currentPixelIterator->g;
-                break;
-            case PixelColor::B:
-                pPixel = &m_currentPixelIterator->b;
-                break;
-            default:
-                throw runtime_error("Unexpected pixel color during encode operation");
-        }
-
-        // the mask is all zeros with a single bit at the encoding position
-        int8_t mask = inputByteBit << m_pixelBitEncodingPos;
+      
+        // encode the bit at the encoding position
+        int8_t mask;
         if (inputByteBit)
         {
             // we encode a '1' bit by performing OR bitwise operation on the pixel byte
-            *pPixel |= mask;
+            mask = inputByteBit << m_pixelBitEncodingPos;
+            *m_pPixel |= mask;
         }
         else
         {
             // we encode a '0' bit by performing AND bitwise operation on the complement of the mask
-            *pPixel &= ~mask;
+            mask = LSB_BYTE_MASK << m_pixelBitEncodingPos;
+            *m_pPixel &= ~mask;
         }
 
-        m_pixelBitEncodingPos++;        
+        m_pixelBitEncodingPos++;
+
+        // check to see if we need to encode data in the next byte of the bitmap
+        if (m_pixelBitEncodingPos > m_bitsPerPixel)
+        {
+            nextDestinationByte();
+        }        
     }
-    
-    cout << "encodeByte called";
+}
+
+void steganographyLib::Steganography::nextDestinationByte()
+{
+    switch(m_currentPixelColor)
+    {
+        case PixelColor::R:
+            m_currentPixelColor = PixelColor::G;
+            m_pPixel = &m_currentPixelIterator->g;
+            break;
+        case PixelColor::G:
+            m_currentPixelColor = PixelColor::B;
+            m_pPixel = &m_currentPixelIterator->b;
+            break;
+        case PixelColor::B:
+            m_currentPixelIterator++;
+            m_pPixel = &m_currentPixelIterator->r;
+            break;
+        default:
+            throw runtime_error("Unexpected pixel color during encode operation");
+    }
+
+    m_pixelBitEncodingPos = 0;
 }
