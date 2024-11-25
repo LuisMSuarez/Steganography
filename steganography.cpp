@@ -67,7 +67,6 @@ void steganographyLib::Steganography::embed(const std::string &originalBitmapFil
             for (streamsize i = 0; i < bytesRead; i++) 
             {
                 encodeByte(buffer[i]);
-                cout << buffer[i] << " ";
             }
         }
 
@@ -120,7 +119,6 @@ void steganographyLib::Steganography::extract(const std::string &sourceBitmapFil
     while (m_currentPixelIterator != m_sourceBitmap.end())
     {
         auto dataByte = decodeByte();
-        cout << dataByte << " ";
         buffer[vectorPos++] = dataByte;
 
         if (vectorPos == FILE_CHUNK_SIZE)
@@ -130,7 +128,7 @@ void steganographyLib::Steganography::extract(const std::string &sourceBitmapFil
         }
     }
 
-    // need to flush the data vector
+    // need to flush the data vector once more, as it may be partially filled.
     if (vectorPos > 0)
     {
         destinationDataFileStream.write(buffer.data(), vectorPos);
@@ -212,7 +210,7 @@ void steganographyLib::Steganography::nextBitmapByte()
         case PixelColor::B:
             m_currentPixelIterator++;
 
-            if ( m_currentPixelIterator == m_sourceBitmap.end())
+            if (m_currentPixelIterator == m_sourceBitmap.end())
             {
                 throw runtime_error("end of source bitmap reached");
             }
