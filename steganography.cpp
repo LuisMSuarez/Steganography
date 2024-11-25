@@ -120,6 +120,7 @@ void steganographyLib::Steganography::extract(const std::string &sourceBitmapFil
     while (m_currentPixelIterator != m_sourceBitmap.end())
     {
         auto dataByte = decodeByte();
+        cout << dataByte << " ";
         buffer[vectorPos++] = dataByte;
 
         if (vectorPos == FILE_CHUNK_SIZE)
@@ -178,12 +179,12 @@ uint8_t steganographyLib::Steganography::decodeByte()
 {
     uint8_t dataByte = 0x00;
 
-    for (int inputByteBitEncodingPos = 0; inputByteBitEncodingPos < 8; inputByteBitEncodingPos++)
+    for (int dataByteBitPos = 0; dataByteBitPos < 8; dataByteBitPos++)
     {
-        uint8_t mask = LSB_BYTE_MASK << inputByteBitEncodingPos;
+        uint8_t mask = LSB_BYTE_MASK << m_pixelBitEncodingPos;
         if (*m_pPixel & mask)
         {
-            dataByte |= LSB_BYTE_MASK << m_pixelBitEncodingPos;
+            dataByte |= LSB_BYTE_MASK << dataByteBitPos;
         }
         m_pixelBitEncodingPos++;
 

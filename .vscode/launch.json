@@ -31,7 +31,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${fileDirname}/${fileBasenameNoExtension}",
-            "args": ["extract", "./data/sample.bmp", "./data/sampleInput.txt", "3"],
+            "args": ["extract", "./data/destinationBitmap.bmp", "./data/extractedOutput.txt", "6"],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",
             "environment": [],
