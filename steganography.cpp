@@ -3,16 +3,17 @@
 #include "steganography.h"
 
 #define FILE_CHUNK_SIZE 1024
+#define LSB_BYTE_MASK 0x01
 
 using namespace std;
 using namespace bmp;
 
-steganographyLib::Steganography::Steganography()
+steganographyLib::Steganography::Steganography() noexcept
 {
     std::cout << "Steganography constructor invoked";
 }
 
-steganographyLib::Steganography::~Steganography()
+steganographyLib::Steganography::~Steganography() noexcept
 {
     std::cout << "Steganography destructor invoked";
 }
@@ -32,10 +33,9 @@ void steganographyLib::Steganography::embed(const std::string &originalBitmapFil
             + " aborting embed operation.");
     }
 
-    Bitmap sourceBitmap;
     try
     {
-        sourceBitmap.load(originalBitmapFilePath);
+        m_sourceBitmap.load(originalBitmapFilePath);
     }
     catch(const bmp::Exception& e)
     {
@@ -50,14 +50,14 @@ void steganographyLib::Steganography::embed(const std::string &originalBitmapFil
     // for performance reasons, we read the input in chunks instead of one byte at a time
     vector<char> buffer(FILE_CHUNK_SIZE);
     auto inputStreamExhausted = false;
-    m_currentPixelIterator = sourceBitmap.begin();
+    m_currentPixelIterator = m_sourceBitmap.begin();
     
     m_pixelBitEncodingPos = 0; // index to the bit (0 to 7) where data will be stored in the current pixel.
     m_currentPixelColor = PixelColor::R;
     m_pPixel = &m_currentPixelIterator->r;
 
     while(!inputStreamExhausted  &&
-          m_currentPixelIterator != sourceBitmap.end())
+          m_currentPixelIterator != m_sourceBitmap.end())
     {
         sourceDataFileStream.read(buffer.data(), buffer.size());
         auto bytesRead = sourceDataFileStream.gcount();
@@ -77,17 +77,16 @@ void steganographyLib::Steganography::embed(const std::string &originalBitmapFil
         }
     }
     sourceDataFileStream.close();
-    sourceBitmap.save(destinationBitmapDataFilePath);
+    m_sourceBitmap.save(destinationBitmapDataFilePath);    
 }
 
 void steganographyLib::Steganography::extract(const std::string &sourceBitmapFilePath, const std::string &destinationDataFilePath, u_int8_t bitsPerPixel)
 {
     setBitsPerPixel(bitsPerPixel);
 
-    Bitmap sourceBitmap;
     try
     {
-        sourceBitmap.load(sourceBitmapFilePath);
+        m_sourceBitmap.load(sourceBitmapFilePath);
     }
     catch(const bmp::Exception& e)
     {
@@ -112,13 +111,13 @@ void steganographyLib::Steganography::extract(const std::string &sourceBitmapFil
     // perform extract operation
     // for performance reasons, we write the output in chunks instead of one byte at a time
     vector<char> buffer(FILE_CHUNK_SIZE);
-    m_currentPixelIterator = sourceBitmap.begin();    
+    m_currentPixelIterator = m_sourceBitmap.begin();    
     m_pixelBitEncodingPos = 0; // index to the bit (0 to 7) where data is encoded in the current pixel.
     m_currentPixelColor = PixelColor::R;
     m_pPixel = &m_currentPixelIterator->r;
     int vectorPos = 0;
 
-    while (m_currentPixelIterator != sourceBitmap.end())
+    while (m_currentPixelIterator != m_sourceBitmap.end())
     {
         auto dataByte = decodeByte();
         buffer[vectorPos++] = dataByte;
@@ -141,8 +140,6 @@ void steganographyLib::Steganography::extract(const std::string &sourceBitmapFil
 
 void steganographyLib::Steganography::encodeByte(const char inputByte)
 {
-    const u_int8_t LSB_BYTE_MASK = 0x01;
-
     // loop with an index to the bit (0 to 7) that is being encoded from the data file byte
     // encoding from least significant bit to most significant bit
     for (int inputByteBitEncodingPos = 0; inputByteBitEncodingPos < 8; inputByteBitEncodingPos++)
@@ -151,6 +148,8 @@ void steganographyLib::Steganography::encodeByte(const char inputByte)
         uint8_t inputByteBit = LSB_BYTE_MASK & (inputByte >> inputByteBitEncodingPos);
       
         // encode the bit at the encoding position
+        // we encode bits starting at the least significant bit positions to ensure we shift
+        // the color of the bit as little as possible.
         int8_t mask;
         if (inputByteBit)
         {
@@ -170,7 +169,7 @@ void steganographyLib::Steganography::encodeByte(const char inputByte)
         // check to see if we need to encode data in the next byte of the bitmap
         if (m_pixelBitEncodingPos == m_bitsPerPixel)
         {
-            nextDestinationByte();
+            nextBitmapByte();
         }        
     }
 }
@@ -178,15 +177,26 @@ void steganographyLib::Steganography::encodeByte(const char inputByte)
 uint8_t steganographyLib::Steganography::decodeByte()
 {
     uint8_t dataByte = 0x00;
-    for(int dataBytePos = 0; dataBytePos < 8; dataBytePos++)
+
+    for (int inputByteBitEncodingPos = 0; inputByteBitEncodingPos < 8; inputByteBitEncodingPos++)
     {
-        
+        uint8_t mask = LSB_BYTE_MASK << inputByteBitEncodingPos;
+        if (*m_pPixel & mask)
+        {
+            dataByte |= LSB_BYTE_MASK << m_pixelBitEncodingPos;
+        }
+        m_pixelBitEncodingPos++;
+
+        if (m_pixelBitEncodingPos == m_bitsPerPixel)
+        {
+            nextBitmapByte();
+        }
     }
 
     return dataByte;
 }
 
-void steganographyLib::Steganography::nextDestinationByte()
+void steganographyLib::Steganography::nextBitmapByte()
 {
     switch(m_currentPixelColor)
     {
@@ -200,10 +210,16 @@ void steganographyLib::Steganography::nextDestinationByte()
             break;
         case PixelColor::B:
             m_currentPixelIterator++;
+
+            if ( m_currentPixelIterator == m_sourceBitmap.end())
+            {
+                throw runtime_error("end of source bitmap reached");
+            }
+            
             m_pPixel = &m_currentPixelIterator->r;
             break;
         default:
-            throw runtime_error("Unexpected pixel color during encode operation");
+            throw runtime_error("Unexpected pixel color during encode/decode operation");
     }
 
     m_pixelBitEncodingPos = 0;
