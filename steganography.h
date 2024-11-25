@@ -16,8 +16,8 @@ namespace steganographyLib
     class Steganography
     {
         public:
-            Steganography();
-            ~Steganography();
+            Steganography() noexcept;
+            ~Steganography() noexcept;
             
             /// @brief Embeds information to a bitmap.
             /// @param originalBitmapFilePath Path to original bitmap that will be used to embed information into its pixels. This bitmap will be opened in readonly mode.
@@ -33,12 +33,15 @@ namespace steganographyLib
             void extract(const std::string &sourceBitmapFilePath, const std::string &destinationDataFilePath, u_int8_t bitsPerPixel);
         private:
             void encodeByte(const char inputByte);
-            void nextDestinationByte();
+            uint8_t decodeByte();
+            void nextBitmapByte();
+            void setBitsPerPixel(int bitsPerPixel);
             
             // member variables
             u_int8_t m_bitsPerPixel;
             std::vector<bmp::Pixel>::iterator m_currentPixelIterator;
             int m_pixelBitEncodingPos;
+            bmp::Bitmap m_sourceBitmap;
             PixelColor m_currentPixelColor;
             uint8_t* m_pPixel;          
     };
