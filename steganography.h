@@ -33,7 +33,9 @@ namespace steganographyLib
             void extract(const std::string &sourceBitmapFilePath, const std::string &destinationDataFilePath, u_int8_t bitsPerPixel);
         private:
             void encodeByte(const char inputByte);
+            uint8_t decodeByte();
             void nextDestinationByte();
+            void setBitsPerPixel(int bitsPerPixel);
             
             // member variables
             u_int8_t m_bitsPerPixel;

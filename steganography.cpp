@@ -2,6 +2,8 @@
 #include <fstream>   // std::*fstream
 #include "steganography.h"
 
+#define FILE_CHUNK_SIZE 1024
+
 using namespace std;
 using namespace bmp;
 
@@ -17,16 +19,7 @@ steganographyLib::Steganography::~Steganography()
 
 void steganographyLib::Steganography::embed(const std::string &originalBitmapFilePath, const std::string &sourceDataFilePath, const std::string &destinationBitmapDataFilePath, u_int8_t bitsPerPixel)
 {
-    // Before manipulating files, verify that bitsPerPixel is a number between 3 and 24 and a multiple of 3.
-    // this number represents how many bits of information from the input file we will pack into each 24-bit RGB pixel.
-    if (bitsPerPixel < 3 ||
-        bitsPerPixel > 24 ||
-        bitsPerPixel % 3 > 0)
-    {
-        throw runtime_error("Invalid value for parameter bitsPerPixel. Must be a value between 3 and 24 and multiple of 3. Aborting embed operation.");
-    }
-
-    m_bitsPerPixel = bitsPerPixel;
+    setBitsPerPixel(bitsPerPixel);
 
     // Open and verify sourceDataFilePath
     auto sourceDataFileStream = ifstream(sourceDataFilePath, ios::binary);
@@ -54,8 +47,8 @@ void steganographyLib::Steganography::embed(const std::string &originalBitmapFil
     }
 
     // perform embed operation
-    // for performance reasons, we read the input in 1K chunks instead of one byte at a time
-    vector<char> buffer(1024);
+    // for performance reasons, we read the input in chunks instead of one byte at a time
+    vector<char> buffer(FILE_CHUNK_SIZE);
     auto inputStreamExhausted = false;
     m_currentPixelIterator = sourceBitmap.begin();
     
@@ -87,9 +80,63 @@ void steganographyLib::Steganography::embed(const std::string &originalBitmapFil
     sourceBitmap.save(destinationBitmapDataFilePath);
 }
 
-void steganographyLib::Steganography::extract(const std::string &source, const std::string &destination, u_int8_t bitsPerPixel)
+void steganographyLib::Steganography::extract(const std::string &sourceBitmapFilePath, const std::string &destinationDataFilePath, u_int8_t bitsPerPixel)
 {
-    cout << "extract called";
+    setBitsPerPixel(bitsPerPixel);
+
+    Bitmap sourceBitmap;
+    try
+    {
+        sourceBitmap.load(sourceBitmapFilePath);
+    }
+    catch(const bmp::Exception& e)
+    {
+        // Repackage exception from underlying library for uniformity.
+        throw runtime_error("Could not open original bitmap file at "
+            + sourceBitmapFilePath
+            + " aborting extract operation."
+            + e.what());
+    }
+
+    // Open and verify destinationDataFilePath
+    auto destinationDataFileStream = ofstream(destinationDataFilePath, ios::binary);
+    if (!destinationDataFileStream || 
+        !destinationDataFileStream.is_open() ||
+        destinationDataFileStream.bad())
+    {
+        throw runtime_error("Could not open destination data file at " 
+            + destinationDataFilePath
+            + " aborting extract operation.");
+    }
+
+    // perform extract operation
+    // for performance reasons, we write the output in chunks instead of one byte at a time
+    vector<char> buffer(FILE_CHUNK_SIZE);
+    m_currentPixelIterator = sourceBitmap.begin();    
+    m_pixelBitEncodingPos = 0; // index to the bit (0 to 7) where data is encoded in the current pixel.
+    m_currentPixelColor = PixelColor::R;
+    m_pPixel = &m_currentPixelIterator->r;
+    int vectorPos = 0;
+
+    while (m_currentPixelIterator != sourceBitmap.end())
+    {
+        auto dataByte = decodeByte();
+        buffer[vectorPos++] = dataByte;
+
+        if (vectorPos == FILE_CHUNK_SIZE)
+        {
+            destinationDataFileStream.write(buffer.data(), buffer.size());
+            vectorPos = 0;
+        }
+    }
+
+    // need to flush the data vector
+    if (vectorPos > 0)
+    {
+        destinationDataFileStream.write(buffer.data(), vectorPos);
+    }
+
+    destinationDataFileStream.close();
 }
 
 void steganographyLib::Steganography::encodeByte(const char inputByte)
@@ -128,6 +175,17 @@ void steganographyLib::Steganography::encodeByte(const char inputByte)
     }
 }
 
+uint8_t steganographyLib::Steganography::decodeByte()
+{
+    uint8_t dataByte = 0x00;
+    for(int dataBytePos = 0; dataBytePos < 8; dataBytePos++)
+    {
+        
+    }
+
+    return dataByte;
+}
+
 void steganographyLib::Steganography::nextDestinationByte()
 {
     switch(m_currentPixelColor)
@@ -149,4 +207,18 @@ void steganographyLib::Steganography::nextDestinationByte()
     }
 
     m_pixelBitEncodingPos = 0;
+}
+
+void steganographyLib::Steganography::setBitsPerPixel(int bitsPerPixel)
+{
+    // Before manipulating files, verify that bitsPerPixel is a number between 3 and 24 and a multiple of 3.
+    // this number represents how many bits of information from the input file we will pack into each 24-bit RGB pixel.
+    if (bitsPerPixel < 3 ||
+        bitsPerPixel > 24 ||
+        bitsPerPixel % 3 > 0)
+    {
+        throw runtime_error("Invalid value for parameter bitsPerPixel. Must be a value between 3 and 24 and multiple of 3. Aborting operation.");
+    }
+
+    m_bitsPerPixel = bitsPerPixel;
 }
