@@ -1,5 +1,6 @@
-#include <iostream>  // std::cout
-#include <fstream>   // std::*fstream
+#include <iostream>   // std::cout
+#include <fstream>    // std::*fstream
+#include <filesystem> // std::filesystem::file_size
 #include "steganography.h"
 
 #define FILE_CHUNK_SIZE 1024
@@ -33,6 +34,14 @@ void steganographyLib::Steganography::embed(const std::string &originalBitmapFil
             + " aborting embed operation.");
     }
 
+    auto rawSourceFileSize = filesystem::file_size(sourceDataFilePath);
+    if (rawSourceFileSize > UINT16_MAX)
+    {
+        throw runtime_error("Source file size is too large");
+    }
+    
+    uint16_t sourceFileSize = static_cast<uint16_t>(rawSourceFileSize); 
+
     try
     {
         m_sourceBitmap.load(originalBitmapFilePath);
@@ -55,6 +64,13 @@ void steganographyLib::Steganography::embed(const std::string &originalBitmapFil
     m_pixelBitEncodingPos = 0; // index to the bit (0 to 7) where data will be stored in the current pixel.
     m_currentPixelColor = PixelColor::R;
     m_pPixel = &m_currentPixelIterator->r;
+
+    // embed the source file size in the first 16 bits of encoded data, so that
+    // the decode operation knows when to stop decoding bytes
+    vector<char> sourceFileSyzeBytes(sizeof(sourceFileSize));
+    std::memcpy(sourceFileSyzeBytes.data(), &sourceFileSize, sizeof(sourceFileSize));
+    encodeByte(sourceFileSyzeBytes[0]); // 8 least significant bytes of the file size
+    encodeByte(sourceFileSyzeBytes[1]); // 8 most significant bytes of the file size
 
     while(!inputStreamExhausted  &&
           m_currentPixelIterator != m_sourceBitmap.end())
