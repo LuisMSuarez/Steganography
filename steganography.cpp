@@ -66,7 +66,7 @@ void steganographyLib::Steganography::embed(const std::string &originalBitmapFil
     m_pPixel = &m_currentPixelIterator->r;
 
     // embed the source file size in the first 16 bits of encoded data, so that
-    // the decode operation knows when to stop decoding bytes
+    // the extract operation knows when to stop decoding bytes
     vector<char> sourceFileSyzeBytes(sizeof(sourceFileSize));
     std::memcpy(sourceFileSyzeBytes.data(), &sourceFileSize, sizeof(sourceFileSize));
     encodeByte(sourceFileSyzeBytes[0]); // 8 least significant bytes of the file size
@@ -132,10 +132,20 @@ void steganographyLib::Steganography::extract(const std::string &sourceBitmapFil
     m_pPixel = &m_currentPixelIterator->r;
     int vectorPos = 0;
 
-    while (m_currentPixelIterator != m_sourceBitmap.end())
+    // the first 16 bits of encoded data indicate the number of data bytes encoded in the file
+    // so that the extract operation knows when to stop decoding bytes
+    uint16_t dataFileSize;
+    vector<char> sourceFileSyzeBytes(sizeof(dataFileSize));
+    sourceFileSyzeBytes[0] = decodeByte(); // 8 least significant bytes of the file size
+    sourceFileSyzeBytes[1] = decodeByte(); // 8 most significant bytes of the file size
+    std::memcpy(&dataFileSize, sourceFileSyzeBytes.data(), sizeof(dataFileSize));
+
+    while (dataFileSize &&
+        m_currentPixelIterator != m_sourceBitmap.end())
     {
         auto dataByte = decodeByte();
         buffer[vectorPos++] = dataByte;
+        dataFileSize--;
 
         if (vectorPos == FILE_CHUNK_SIZE)
         {
