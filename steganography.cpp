@@ -55,6 +55,15 @@ void steganographyLib::Steganography::embed(const std::string &originalBitmapFil
             + e.what());
     }
 
+    // verify that the bitmap can fit in the encoded file with the provided
+    // bits per pixel density
+    auto maxFileSizeBytes = (m_sourceBitmap.height() * m_sourceBitmap.width() * m_bitsPerPixel) / 8 ;
+    auto encodedFileSizeBytes = rawSourceFileSize + sizeof(sourceFileSize);
+    if (encodedFileSizeBytes > maxFileSizeBytes)
+    {
+        throw runtime_error("Data file is too large to fit in the bitmap.  Use a larger bitmap or a higher packing density.");
+    }
+
     // perform embed operation
     // for performance reasons, we read the input in chunks instead of one byte at a time
     vector<char> buffer(FILE_CHUNK_SIZE);
