@@ -58,5 +58,6 @@ The above process would then be repeated to encode a complete message.  Note tha
 Below you can compare the original bitmap on the left, and the resulting bitmap on the right, where I encoded 2.3KB of "Lorem Ipsum" text. Using 6 bits per pixel of encoding density.
 Note: markdown files on GitHub don't support uploading bitmaps, so I had to repackage them in the PNG format, which is also lossless.
 The human eye cannot percieve any change between the two.
+
 ![sample](https://github.com/user-attachments/assets/b608b7dd-5fc1-4bb2-8106-50b8d778939a) ![destinationBitmap](https://github.com/user-attachments/assets/46572b13-e549-4c60-845d-3f65d2b5217e)
 
