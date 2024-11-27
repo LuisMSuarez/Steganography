@@ -13,7 +13,7 @@ Examples:
 
 For this project, I leveraged the [Microsoft BMP file format](https://en.wikipedia.org/wiki/BMP_file_format) which is an uncompressed raster image.
 I also wanted to code this project using C++ in a Linux environment.  For my setup, I used [OpenSuse Tumbleweed](https://get.opensuse.org/tumbleweed/) and [VSCode IDE](https://code.visualstudio.com/), with the g++ compiler.
-I used the [BitmapPlusPlus](https://github.com/baderouaich/BitmapPlusPlus) library (MIT license), which is conveniently packaged as a single C++ header file, which is easy to use in your own project.
+For reading/writing the bitmap, I used the [BitmapPlusPlus](https://github.com/baderouaich/BitmapPlusPlus) library (MIT license), which is conveniently packaged as a single C++ header file, which makes it easy to use in your own project.  This served two purposes: allow me to focus on my core logic and practice usage of open source libraries.
 
 The RGB pixels in a bitmap are a convenient container for embedding other content (text or any binary file).  Each pixel is a 24-bit value.  The caller can decide the "bitsPerPixel" or encoding density,
 which determines how many bits from the 24 bit pixel will be used to embed content.  Selecting a small value, such as 3, means that only the least significant bit from each RGB component
@@ -31,7 +31,7 @@ Of course, this method could be discovered by a middle-man.  It is not intended 
 
 Below is an example showing how a single letter could be encoded to the first 3 pixels of a bitmap
 
-Orignal bitmap (showing bytes in both decimal and binary):
+Original bitmap (showing bytes in both decimal and binary):
 
 | Pixel    | R | G | B |
 | -------- | ------- | ------- |------- |
@@ -39,7 +39,8 @@ Orignal bitmap (showing bytes in both decimal and binary):
 | 1  | 245 (1111 0101)| 222 (1101 1110)| 179 (1011 0011)|
 | 2  | 250 (1111 1010)| 128 (1000 0000)| 114 (1110 0010)|
 
-The letter 'H' in ASCII has the following binary value: 0100 1000
+Suppose we want to encode the message "Hello world" into the above bitmap.
+The first letter/byte in the message 'H' in ASCII has the following binary value: 0100 1000
 
 Assuming we encode 3 bits into each RGB pixel, the resulting 'shifted' pixels would be as shown in the table below, where the convention is:
 1. Input bits are encoded from LSB to MSB
@@ -51,4 +52,11 @@ Assuming we encode 3 bits into each RGB pixel, the resulting 'shifted' pixels wo
 | 1  | 245 (1111 0101)| 222 (1101 1110)| **178 (1011 0010)**|
 | 2  | **251 (1111 1011)**| 128 (1000 0000)| 114 (1110 0010)|
 
-Note how only 2 bytes actually had to be shifted by a single digit, 6 other bytes required no shift at all as the LSB matched the value of the pixel being encoded.
+Note how only 2 bytes (in bold) actually had to be shifted by a single digit, 6 other bytes required no shift at all as the LSB matched the value of the pixel being encoded.
+The above process would then be repeated to encode a complete message.  Note that this not only works for text files in ASCII format, but for any binary file, as the encoder just reads the input file one byte at a time, without making any further assumptions
+
+Below you can compare the original bitmap on the left, and the resulting bitmap on the right, where I encoded 2.3KB of "Lorem Ipsum" text. Using 6 bits per pixel of encoding density.
+Note: markdown files on GitHub don't support uploading bitmaps, so I had to repackage them in the PNG format, which is also lossless.
+The human eye cannot percieve any change between the two.
+![sample](https://github.com/user-attachments/assets/b608b7dd-5fc1-4bb2-8106-50b8d778939a) ![destinationBitmap](https://github.com/user-attachments/assets/46572b13-e549-4c60-845d-3f65d2b5217e)
+
