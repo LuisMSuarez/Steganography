@@ -149,6 +149,17 @@ void steganographyLib::Steganography::extract(const std::string &sourceBitmapFil
     sourceFileSyzeBytes[1] = decodeByte(); // 8 most significant bytes of the file size
     std::memcpy(&dataFileSize, sourceFileSyzeBytes.data(), sizeof(dataFileSize));
 
+    // verify that the bitmap can hold at least 'dataFileSize' bytes, based on the number of pixels
+    // in the image and the value provided for 'bitsPerPixel'
+    // this protects against cases where the bitmap that has been provided is not a valid encoded file
+    auto maxEncodedBytes = (m_sourceBitmap.width() * m_sourceBitmap.height() * bitsPerPixel)/8 - sizeof(dataFileSize);
+    if (dataFileSize > maxEncodedBytes)
+    {
+        throw runtime_error("Could not decode bitmap at " 
+            + sourceBitmapFilePath
+            + " the bitmap may not be a valid encoded file or try selecting a higher value for 'bitsPerPixel'.");
+    }
+
     while (dataFileSize &&
         m_currentPixelIterator != m_sourceBitmap.end())
     {
