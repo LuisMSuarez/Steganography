@@ -84,7 +84,10 @@ void steganographyLib::Steganography::embed(const std::string &originalBitmapFil
           m_currentPixelIterator != m_sourceBitmap.end())
     {
         sourceDataFileStream.read(buffer.data(), buffer.size());
-        m_progressCallback(0);
+        if(m_progressCallback != nullptr)
+        {
+            m_progressCallback(0);
+        }
         auto bytesRead = sourceDataFileStream.gcount();
 
         if (bytesRead > 0)
@@ -183,10 +186,10 @@ void steganographyLib::Steganography::extract(const std::string &sourceBitmapFil
     destinationDataFileStream.close();
 }
 
-void steganographyLib::Steganography::registerProgressCallback(ProgressCallback callbackFunction) noexcept
+void steganographyLib::Steganography::registerProgressCallback(ProgressCallback callbackFunction, int percentGrain) noexcept
 {
     m_progressCallback = callbackFunction;
-    std::cout << "Callback function registered";
+    m_progressCallbackPercentGrain = percentGrain;
 }
 
 void steganographyLib::Steganography::encodeByte(const char inputByte)

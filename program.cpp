@@ -12,7 +12,7 @@ int main(int argc, char* argv[])
 {
     const int errorCodeInvalidArguments = 1;
     steganographyLib::Steganography steg;
-    steg.registerProgressCallback(progressCallback);
+    steg.registerProgressCallback(progressCallback, 10);
     string usage = "steganography embed bitmapPath sourceData destinationBitmap bitsPerPixel |\nsteganographyextract bitmapPath destinationFile bitsPerPixel";
         
     // Command line parsing
