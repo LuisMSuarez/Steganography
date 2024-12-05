@@ -13,6 +13,8 @@ namespace steganographyLib
         B
     };
 
+    typedef void (*ProgressCallback)(int progressPercentage);
+
     class Steganography
     {
         public:
@@ -31,6 +33,8 @@ namespace steganographyLib
             /// @param destinationDataFilePath Path to file that will be the result of extracting information from the original bitmap file.
             /// @param bitsPerPixel Resolution that determines how many bits from each RGB pixel (24 bits) encodes source data.  Must be a multiple of 3 between 3 and 24. 
             void extract(const std::string &sourceBitmapFilePath, const std::string &destinationDataFilePath, u_int8_t bitsPerPixel);
+
+            void registerProgressCallback(ProgressCallback callbackFunction);
         private:
             void encodeByte(const char inputByte);
             uint8_t decodeByte();
@@ -43,6 +47,7 @@ namespace steganographyLib
             int m_pixelBitEncodingPos;
             bmp::Bitmap m_sourceBitmap;
             PixelColor m_currentPixelColor;
-            uint8_t* m_pPixel;          
+            uint8_t* m_pPixel;  
+            ProgressCallback m_progressCallback;        
     };
 }

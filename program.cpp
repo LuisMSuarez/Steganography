@@ -3,12 +3,18 @@
 
 using namespace std;
 
+ void progressCallback(int progressPercentage)
+ {
+    cout << "*";
+ }
+ 
 int main(int argc, char* argv[])
 {
     const int errorCodeInvalidArguments = 1;
     steganographyLib::Steganography steg;
+    steg.registerProgressCallback(progressCallback);
     string usage = "steganography embed bitmapPath sourceData destinationBitmap bitsPerPixel |\nsteganographyextract bitmapPath destinationFile bitsPerPixel";
-    
+        
     // Command line parsing
     if (argc < 2)
     {

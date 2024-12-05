@@ -11,12 +11,11 @@ using namespace bmp;
 
 steganographyLib::Steganography::Steganography() noexcept
 {
-    std::cout << "Steganography constructor invoked";
+    m_progressCallback = nullptr;
 }
 
 steganographyLib::Steganography::~Steganography() noexcept
 {
-    std::cout << "Steganography destructor invoked";
 }
 
 void steganographyLib::Steganography::embed(const std::string &originalBitmapFilePath, const std::string &sourceDataFilePath, const std::string &destinationBitmapDataFilePath, u_int8_t bitsPerPixel)
@@ -85,6 +84,7 @@ void steganographyLib::Steganography::embed(const std::string &originalBitmapFil
           m_currentPixelIterator != m_sourceBitmap.end())
     {
         sourceDataFileStream.read(buffer.data(), buffer.size());
+        m_progressCallback(0);
         auto bytesRead = sourceDataFileStream.gcount();
 
         if (bytesRead > 0)
@@ -181,6 +181,12 @@ void steganographyLib::Steganography::extract(const std::string &sourceBitmapFil
     }
 
     destinationDataFileStream.close();
+}
+
+void steganographyLib::Steganography::registerProgressCallback(ProgressCallback callbackFunction) noexcept
+{
+    m_progressCallback = callbackFunction;
+    std::cout << "Callback function registered";
 }
 
 void steganographyLib::Steganography::encodeByte(const char inputByte)
