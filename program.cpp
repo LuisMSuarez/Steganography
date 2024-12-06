@@ -3,6 +3,9 @@
 
 using namespace std;
 
+// Examples of callbacks we can plug in to display progress of the encoding/extracting operations
+// this demonstrates good decoupling between the steganography core library and the presentation layer.
+// In a UX application, a progress bar can be plugged in using this same method.
 void asteriskProgressCallback(int progressPercentage)
 {
    cout << "*";
@@ -19,7 +22,7 @@ int main(int argc, char* argv[])
     steganographyLib::Steganography steg;
 
     // Note: in C++, the name of a function 'decays' to a pointer to that function
-    steg.registerProgressCallback(percentageProgressCallback, 10);
+    steg.registerProgressCallback(percentageProgressCallback, /* percentGrain */ 10);
     string usage = "steganography embed bitmapPath sourceData destinationBitmap bitsPerPixel |\nsteganographyextract bitmapPath destinationFile bitsPerPixel";
         
     // Command line parsing

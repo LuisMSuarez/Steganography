@@ -83,10 +83,10 @@ void steganographyLib::Steganography::embed(const std::string &originalBitmapFil
     encodeByte(sourceFileSizeBytes[1]); // 8 most significant bytes of the file size
 
     // determine the correspondence between bytes of encoded data and grain for the callback function
-    int bytesPerProgress, progress = 0, encodedByteCount = 0;
+    int bytesPerProgress, encodedByteCount = 0;
     if (m_progressCallback != nullptr)
     {
-        assert(m_progressCallbackPercentGrain > 0);
+        assert(m_progressCallbackPercentGrain > 0); // m_progressCallbackPercentGrain is validated when setting the callback, so should never be 0.
         int clicks = 100 / m_progressCallbackPercentGrain;
         bytesPerProgress = sourceFileSize / clicks;
     }
@@ -102,13 +102,10 @@ void steganographyLib::Steganography::embed(const std::string &originalBitmapFil
             for (streamsize i = 0; i < bytesRead; i++) 
             {
                 encodeByte(buffer[i]);
-                progress++;
-                encodedByteCount++;
                 if (m_progressCallback != nullptr &&
-                   progress % bytesPerProgress == 0)
+                   ++encodedByteCount % bytesPerProgress == 0)
                 {
                     m_progressCallback(ceil((100*encodedByteCount)/(double)sourceFileSize));
-                    progress = 0;
                 }
             }
         }
@@ -179,10 +176,10 @@ void steganographyLib::Steganography::extract(const std::string &sourceBitmapFil
     }
 
     // determine the correspondence between bytes of extracted data and grain for the callback function
-    int bytesPerProgress, progress = 0, extractedByteCount = 0;
+    int bytesPerProgress, extractedByteCount = 0;
     if (m_progressCallback != nullptr)
     {
-        assert(m_progressCallbackPercentGrain > 0);
+        assert(m_progressCallbackPercentGrain > 0); // m_progressCallbackPercentGrain is validated when setting the callback, so should never be 0.
         int clicks = 100 / m_progressCallbackPercentGrain;
         bytesPerProgress = dataFileSize / clicks;
     }
@@ -199,13 +196,10 @@ void steganographyLib::Steganography::extract(const std::string &sourceBitmapFil
             vectorPos = 0;
         }
 
-        progress++;
-        extractedByteCount++;
         if (m_progressCallback != nullptr &&
-            progress % bytesPerProgress == 0)
+            ++extractedByteCount % bytesPerProgress == 0)
         {
             m_progressCallback(ceil((100*extractedByteCount)/(double)dataFileSize));
-            progress = 0;
         }
     }
 

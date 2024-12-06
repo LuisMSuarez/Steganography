@@ -13,7 +13,7 @@ namespace steganographyLib
         B
     };
 
-    typedef void (*ProgressCallback)(int progressPercentage);
+    typedef void (*ProgressCallback)(int progressPercentageComplete);
 
     class Steganography
     {
