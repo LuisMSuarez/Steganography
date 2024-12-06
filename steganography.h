@@ -35,9 +35,10 @@ namespace steganographyLib
             void extract(const std::string &sourceBitmapFilePath, const std::string &destinationDataFilePath, u_int8_t bitsPerPixel);
 
             /// @brief Registers a callback function to be invoked during both the embed and extract methods.
-            /// Allows the caller to be updated with the progress of these potentially long-running operations, such as for logging or to display a progress bar to the user. 
+            /// Allows the caller to be notified with the progress of these operations, such as for logging or to display a progress bar to the user. 
             /// @param callbackFunction The callback function that will be invoked.
-            /// @param percentGrain value between 1 to 100, indicating after how many units of completed work (over a total of 100) will the callback be invoked.  Example, if 1 is provided, 100 callbacks will be invoked.  If 50 is provided 2 callbacks will be invoked.
+            /// @param percentGrain value between 1 to 100, indicating after how many percentage units of completed work (over a total of 100) will the callback be invoked.
+            //  Example, if 1 is provided, 100 callbacks will be invoked.  If 50 is provided 2 callbacks will be invoked.
             void registerProgressCallback(ProgressCallback callbackFunction, int percentGrain = 10);
         private:
             void encodeByte(const char inputByte);

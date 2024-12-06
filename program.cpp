@@ -3,16 +3,23 @@
 
 using namespace std;
 
- void progressCallback(int progressPercentage)
- {
-    cout << "*";
- }
+void asteriskProgressCallback(int progressPercentage)
+{
+   cout << "*";
+}
+
+void percentageProgressCallback(int progressPercentage)
+{
+   cout << "Percent complete: " << progressPercentage << "\n";
+}
  
 int main(int argc, char* argv[])
 {
     const int errorCodeInvalidArguments = 1;
     steganographyLib::Steganography steg;
-    steg.registerProgressCallback(progressCallback, 10);
+
+    // Note: in C++, the name of a function 'decays' to a pointer to that function
+    steg.registerProgressCallback(percentageProgressCallback, 10);
     string usage = "steganography embed bitmapPath sourceData destinationBitmap bitsPerPixel |\nsteganographyextract bitmapPath destinationFile bitsPerPixel";
         
     // Command line parsing
