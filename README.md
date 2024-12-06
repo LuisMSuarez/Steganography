@@ -1,5 +1,5 @@
 Steganography is the art of hiding or encoding a message within another message, image or file.
-A bitmap (BMP) image is a perfect vessel for encoding another message.  A bitmap is essentially a matrix of pixels, where each pixel is made up of Red, Green and Blue 8-bit values.
+A bitmap (BMP) image is a perfect vessel for encoding another message.  A 24-bit bitmap is essentially a matrix of pixels, where each pixel is made up of Red, Green and Blue 8-bit values.
 
 Examples:
 
@@ -15,7 +15,9 @@ For this project, I leveraged the [Microsoft BMP file format](https://en.wikiped
 I also wanted to code this project using C++ in a Linux environment.  For my setup, I used [OpenSuse Tumbleweed](https://get.opensuse.org/tumbleweed/) and [VSCode IDE](https://code.visualstudio.com/), with the g++ compiler.
 For reading/writing the bitmap, I used the [BitmapPlusPlus](https://github.com/baderouaich/BitmapPlusPlus) library (MIT license), which is conveniently packaged as a single C++ header file, which makes it easy to use in your own project.  This served two purposes: allow me to focus on my core logic and practice usage of open source libraries.
 
-The RGB pixels in a bitmap are a convenient container for embedding other content (text or any binary file).  Each pixel is a 24-bit value.  The caller can decide the "bitsPerPixel" or encoding density,
+One of my key goals in this project was to have clean separation of concerns between the presentation layer (command-line interface via main() entry point) and the core library for encoding/decoding content.  I'm particularly pleased with the 'callback' pattern I introduced to allow the caller to subscribe to 'progress' notifications from the core library, to display progress to the user in any fashion, such as via command-line output or progress bar in UX applications, where the core library and the presentation layer remain cleanly decoupled, with no dependency on the inner workings of eachother.
+
+The RGB pixels in a bitmap are a convenient container for embedding other content (text or any binary file).  Each pixel is a 24-bit value.  Note: there are also 32-bit pixels where an additional A or Alpha value is provided for transparency.  For this project I focused on 24-bit bitmaps, but the code can easily be extended to support 32-bit pixels.  The caller can decide the "bitsPerPixel" or encoding density,
 which determines how many bits from the 24 bit pixel will be used to embed content.  Selecting a small value, such as 3, means that only the least significant bit from each RGB component
 will be shifted to store content, where the human eye cannot percieve any difference from the original image.  The theoretical limit for encoding density is 24, which means that
 content will be encoded across the entire 24 bits, however this will produce perceptible changes.
