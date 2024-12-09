@@ -21,8 +21,11 @@ int main(int argc, char* argv[])
     const int errorCodeInvalidArguments = 1;
     steganographyLib::Steganography steg;
 
-    // Note: in C++, the name of a function 'decays' to a pointer to that function
-    steg.registerProgressCallback(percentageProgressCallback, /* percentGrain */ 10);
+    steg.registerProgressCallback(
+        [](int num) -> void 
+        { 
+            return percentageProgressCallback(num); 
+        }, /* percentGrain */ 10);
     string usage = "steganography embed bitmapPath sourceData destinationBitmap bitsPerPixel |\nsteganographyextract bitmapPath destinationFile bitsPerPixel";
         
     // Command line parsing
