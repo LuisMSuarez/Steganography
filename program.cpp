@@ -19,46 +19,61 @@ void percentageProgressCallback(int progressPercentage)
 int main(int argc, char* argv[])
 {
     const int errorCodeInvalidArguments = 1;
-    steganographyLib::Steganography steg;
+    const string usage = "steganography embed bitmapPath sourceData destinationBitmap bitsPerPixel |\nsteganographyextract bitmapPath destinationFile bitsPerPixel";
+   
+    auto returnCode = 0; // success
 
-    steg.registerProgressCallback(
+    // Apply dependency inversion principle by taking dependency on abstractions, not concretions.
+    steganographyLib::ISteganography *steg = new steganographyLib::Steganography();
+
+    steg->registerProgressCallback(
         [](int num) -> void 
         { 
             return percentageProgressCallback(num); 
         }, /* percentGrain */ 10);
-    string usage = "steganography embed bitmapPath sourceData destinationBitmap bitsPerPixel |\nsteganographyextract bitmapPath destinationFile bitsPerPixel";
-        
+         
     // Command line parsing
     if (argc < 2)
     {
         cout << "Invalid argument count\n" << usage;
-        exit(errorCodeInvalidArguments);
+        returnCode = errorCodeInvalidArguments;
     }
-    if (string(argv[1]).compare("embed") == 0)
+    else if (string(argv[1]).compare("embed") == 0)
     {
         if (argc != 6)
         {
             cout << "Invalid argument count for embed operation\n" << usage;
-            exit(errorCodeInvalidArguments);
+            returnCode = errorCodeInvalidArguments;
         }
-        int bitsPerPixel = strtol(argv[5], NULL, 10);
-        steg.embed(argv[2],argv[3], argv[4], bitsPerPixel);
+        else
+        {
+            int bitsPerPixel = strtol(argv[5], NULL, 10);
+            steg->embed(argv[2],argv[3], argv[4], bitsPerPixel);
+        }
     }
     else if (string(argv[1]).compare("extract") == 0)
     {
         if (argc != 5)
         {
             cout << "Invalid argument count for extract operation\n" << usage;
-            exit(errorCodeInvalidArguments);
+            returnCode = errorCodeInvalidArguments;
         }
-        int bitsPerPixel = strtol(argv[4], NULL, 10);
-        steg.extract(argv[2],argv[3], bitsPerPixel);
+        else
+        {
+            int bitsPerPixel = strtol(argv[4], NULL, 10);
+            steg->extract(argv[2],argv[3], bitsPerPixel);
+        }
     }
     else
     {
         cout << "Invalid operation'" << argv[1] << "'.\n" << usage;
-        exit(1);
+        returnCode = errorCodeInvalidArguments;
     }
 
-    return 0;
+    if (steg != nullptr)
+    {
+        delete steg;
+    }
+
+    return returnCode;
 }
