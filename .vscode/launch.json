@@ -31,7 +31,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${fileDirname}/${fileBasenameNoExtension}",
-            "args": ["extract", "./data/destinationBitmap.bmp", "./data/extractedOutput.txt", "6"],
+            "args": ["extract", "./data/embedded_6bits.bmp", "./data/extractedOutput.txt", "6"],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",
             "environment": [],
