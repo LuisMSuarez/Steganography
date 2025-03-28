@@ -8,7 +8,7 @@ TEST(SteganographyTest, EmbedValidText) {
     Steganography steg;
     std::string sourceDataFilePath = "../../data/sampleInput.txt";
     std::string originalBitmapFilePath = "../../data/sample.bmp";
-    std::string destinationDataFilePath = "../../data/destinationBitmapTest.bmp";
+    std::string destinationDataFilePath = "embeddedBitmap_6bits.bmp";
     uint8_t bitsPerPixel = 6;
 
     // Ensure the source bitmap exists
@@ -29,8 +29,8 @@ TEST(SteganographyTest, EmbedValidText) {
 
 TEST(SteganographyTest, ExtractValidBitmap) {
     Steganography steg;
-    std::string sourceBitmapFilePath = "test_data/valid_bitmap.bmp";
-    std::string destinationDataFilePath = "test_data/output_data.txt";
+    std::string sourceBitmapFilePath = "../../data/embedded_6bits.bmp";
+    std::string destinationDataFilePath = "output_data.txt";
     uint8_t bitsPerPixel = 6;
 
     // Ensure the source bitmap exists

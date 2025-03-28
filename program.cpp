@@ -19,7 +19,7 @@ void percentageProgressCallback(int progressPercentage)
 int main(int argc, char* argv[])
 {
     const int errorCodeInvalidArguments = 1;
-    const string usage = "steganography embed bitmapPath sourceData destinationBitmap bitsPerPixel |\nsteganographyextract bitmapPath destinationFile bitsPerPixel";
+    const string usage = "steganography embed bitmapPath sourceData destinationBitmap bitsPerPixel |\nsteganography extract bitmapPath destinationFile bitsPerPixel";
    
     auto returnCode = 0; // success
 

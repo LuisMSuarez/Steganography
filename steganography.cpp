@@ -188,6 +188,7 @@ void steganographyLib::Steganography::extract(const std::string &sourceBitmapFil
         m_currentPixelIterator != m_sourceBitmap.end())
     {
         auto dataByte = decodeByte();
+        extractedByteCount++;
         buffer[vectorPos++] = dataByte;
 
         if (vectorPos == FILE_CHUNK_SIZE)
@@ -197,7 +198,7 @@ void steganographyLib::Steganography::extract(const std::string &sourceBitmapFil
         }
 
         if (m_progressCallback != nullptr &&
-            ++extractedByteCount % bytesPerProgress == 0)
+            extractedByteCount % bytesPerProgress == 0)
         {
             m_progressCallback(ceil((100*extractedByteCount)/(double)dataFileSize));
         }
