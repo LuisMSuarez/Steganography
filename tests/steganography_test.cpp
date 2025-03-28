@@ -2,8 +2,33 @@
 #include <filesystem>
 #include "../steganography.h"
 
+using namespace steganographyLib;
+
+TEST(SteganographyTest, EmbedValidText) {
+    Steganography steg;
+    std::string sourceDataFilePath = "../../data/sampleInput.txt";
+    std::string originalBitmapFilePath = "../../data/sample.bmp";
+    std::string destinationDataFilePath = "../../data/destinationBitmapTest.bmp";
+    uint8_t bitsPerPixel = 6;
+
+    // Ensure the source bitmap exists
+    ASSERT_TRUE(std::filesystem::exists(originalBitmapFilePath));
+
+    // Ensure the source data exists
+    ASSERT_TRUE(std::filesystem::exists(sourceDataFilePath));
+
+    // Call the extract method
+    EXPECT_NO_THROW(steg.embed(originalBitmapFilePath, sourceDataFilePath, destinationDataFilePath, bitsPerPixel));
+
+    // Verify the output file is created
+    EXPECT_TRUE(std::filesystem::exists(destinationDataFilePath));
+
+    // Clean up
+    std::filesystem::remove(destinationDataFilePath);
+}
+
 TEST(SteganographyTest, ExtractValidBitmap) {
-    steganographyLib::Steganography steg;
+    Steganography steg;
     std::string sourceBitmapFilePath = "test_data/valid_bitmap.bmp";
     std::string destinationDataFilePath = "test_data/output_data.txt";
     uint8_t bitsPerPixel = 6;
@@ -22,7 +47,7 @@ TEST(SteganographyTest, ExtractValidBitmap) {
 }
 
 TEST(SteganographyTest, ExtractInvalidBitmapPath) {
-    steganographyLib::Steganography steg;
+    Steganography steg;
     std::string sourceBitmapFilePath = "test_data/nonexistent_bitmap.bmp";
     std::string destinationDataFilePath = "test_data/output_data.txt";
     uint8_t bitsPerPixel = 6;
@@ -32,7 +57,7 @@ TEST(SteganographyTest, ExtractInvalidBitmapPath) {
 }
 
 TEST(SteganographyTest, ExtractInvalidBitsPerPixel) {
-    steganographyLib::Steganography steg;
+    Steganography steg;
     std::string sourceBitmapFilePath = "test_data/valid_bitmap.bmp";
     std::string destinationDataFilePath = "test_data/output_data.txt";
     uint8_t invalidBitsPerPixel = 5; // Not a multiple of 3
@@ -45,7 +70,7 @@ TEST(SteganographyTest, ExtractInvalidBitsPerPixel) {
 }
 
 TEST(SteganographyTest, ExtractCorruptedBitmap) {
-    steganographyLib::Steganography steg;
+    Steganography steg;
     std::string sourceBitmapFilePath = "test_data/corrupted_bitmap.bmp";
     std::string destinationDataFilePath = "test_data/output_data.txt";
     uint8_t bitsPerPixel = 6;
