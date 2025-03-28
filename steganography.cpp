@@ -102,8 +102,9 @@ void steganographyLib::Steganography::embed(const std::string &originalBitmapFil
             for (streamsize i = 0; i < bytesRead; i++)
             {
                 encodeByte(buffer[i]);
+                encodedByteCount++;
                 if (m_progressCallback != nullptr &&
-                   ++encodedByteCount % bytesPerProgress == 0)
+                    encodedByteCount % bytesPerProgress == 0)
                 {
                     m_progressCallback(ceil((100*encodedByteCount)/(double)sourceFileSize));
                 }
