@@ -7,11 +7,14 @@ project(SteganographyTests LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
+# Set policy CMP0135: Use the cmake_policy command to set CMP0135 to NEW. This enforces the new behavior where extracted files get the extraction timestamp by default.
+cmake_policy(SET CMP0135 NEW)
+
 # Add Google Test
 include(FetchContent)
 FetchContent_Declare(
     googletest
-    URL https://github.com/google/googletest/archive/refs/tags/release-1.12.1.tar.gz
+    URL https://github.com/google/googletest/archive/refs/tags/v1.16.0.tar.gz
 )
 # For Windows: Prevent overriding the parent project's compiler/linker settings
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)

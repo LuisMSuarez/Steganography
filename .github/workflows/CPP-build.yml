@@ -1,0 +1,36 @@
+name: C++ CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
+  BUILD_TYPE: Debug
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Configure CMake
+          # Configure CMake in a 'build' subdirectory
+      run: cmake -S . -B build/${{env.BUILD_TYPE}} -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+    - name: Build
+          # We don't need to set up the environment variable for CMake to see Qt because the install-qt-action
+          # sets up the necessary variables automatically
+      run: cmake --build build/${{env.BUILD_TYPE}} --config ${{env.BUILD_TYPE}}
+    - name: Tests
+      working-directory: ${{github.workspace}}/build/${{env.BUILD_TYPE}}/tests
+      run: ctest -V -O test_world.log --timeout 5 -C ${{env.BUILD_TYPE}}
+    - name: Archive build artifacts
+      # https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/storing-and-sharing-data-from-a-workflow
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-artifacts-${{ matrix.os }}
+        path: build
