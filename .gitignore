@@ -1,3 +1,4 @@
 steganography
 program
 /build*/
+CMakeLists.txt.user*

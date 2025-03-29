@@ -6,8 +6,8 @@ using namespace steganographyLib;
 
 TEST(SteganographyTest, EmbedValidText_NoCallback) {
     Steganography steg;
-    std::string sourceDataFilePath = "../../data/sampleInput.txt";
-    std::string originalBitmapFilePath = "../../data/sample.bmp";
+    std::string sourceDataFilePath = "../../../data/sampleInput.txt";
+    std::string originalBitmapFilePath = "../../../data/sample.bmp";
     std::string destinationDataFilePath = "embeddedBitmap_6bits.bmp";
     uint8_t bitsPerPixel = 6;
 
@@ -35,8 +35,8 @@ void EmbedValidText_Callback_testCallback(int progressPercentage)
 
 TEST(SteganographyTest, EmbedValidText_Callback) {
     Steganography steg;
-    std::string sourceDataFilePath = "../../data/sampleInput.txt";
-    std::string originalBitmapFilePath = "../../data/sample.bmp";
+    std::string sourceDataFilePath = "../../../data/sampleInput.txt";
+    std::string originalBitmapFilePath = "../../../data/sample.bmp";
     std::string destinationDataFilePath = "embeddedBitmap_6bits.bmp";
     uint8_t bitsPerPixel = 6;
 
@@ -64,7 +64,7 @@ TEST(SteganographyTest, EmbedValidText_Callback) {
 
 TEST(SteganographyTest, ExtractValidBitmap_NoCallback) {
     Steganography steg;
-    std::string sourceBitmapFilePath = "../../data/embedded_6bits.bmp";
+    std::string sourceBitmapFilePath = "../../../data/embedded_6bits.bmp";
     std::string destinationDataFilePath = "output_data.txt";
     uint8_t bitsPerPixel = 6;
 
@@ -89,7 +89,7 @@ void ExtractValidBitmap_Callback_testCallback(int progressPercentage)
 
 TEST(SteganographyTest, ExtractValidBitmap_Callback) {
     Steganography steg;
-    std::string sourceBitmapFilePath = "../../data/embedded_6bits.bmp";
+    std::string sourceBitmapFilePath = "../../../data/embedded_6bits.bmp";
     std::string destinationDataFilePath = "output_data.txt";
     uint8_t bitsPerPixel = 6;
 
@@ -124,7 +124,7 @@ TEST(SteganographyTest, ExtractInvalidBitmapPath) {
 
 TEST(SteganographyTest, ExtractInvalidBitsPerPixel) {
     Steganography steg;
-    std::string sourceBitmapFilePath = "../../data/embedded_6bits.bmp";
+    std::string sourceBitmapFilePath = "../../../data/embedded_6bits.bmp";
     std::string destinationDataFilePath = "output_data.txt";
     uint8_t invalidBitsPerPixel = 5; // Not a multiple of 3
 
