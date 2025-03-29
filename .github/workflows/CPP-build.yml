@@ -27,3 +27,10 @@ jobs:
     - name: Tests
       working-directory: ${{github.workspace}}/build/${{env.BUILD_TYPE}}/tests
       run: ctest -V -O test_world.log --timeout 5 -C ${{env.BUILD_TYPE}}
+    - name: Archive build artifacts
+      # https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/storing-and-sharing-data-from-a-workflow
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-artifacts-${{ matrix.os }}
+        path: build
