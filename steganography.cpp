@@ -20,7 +20,7 @@ steganographyLib::Steganography::~Steganography() noexcept
 {
 }
 
-void steganographyLib::Steganography::embed(const std::string &originalBitmapFilePath, const std::string &sourceDataFilePath, const std::string &destinationBitmapDataFilePath, u_int8_t bitsPerPixel)
+void steganographyLib::Steganography::embed(const std::string &originalBitmapFilePath, const std::string &sourceDataFilePath, const std::string &destinationBitmapDataFilePath, std::uint8_t bitsPerPixel)
 {
     setBitsPerPixel(bitsPerPixel);
 
@@ -41,7 +41,7 @@ void steganographyLib::Steganography::embed(const std::string &originalBitmapFil
         throw runtime_error("Source file size is too large");
     }
 
-    uint16_t sourceFileSize = static_cast<uint16_t>(rawSourceFileSize);
+    std::uint16_t sourceFileSize = static_cast<std::uint16_t>(rawSourceFileSize);
 
     try
     {
@@ -120,7 +120,7 @@ void steganographyLib::Steganography::embed(const std::string &originalBitmapFil
     m_sourceBitmap.save(destinationBitmapDataFilePath);
 }
 
-void steganographyLib::Steganography::extract(const std::string &sourceBitmapFilePath, const std::string &destinationDataFilePath, u_int8_t bitsPerPixel)
+void steganographyLib::Steganography::extract(const std::string &sourceBitmapFilePath, const std::string &destinationDataFilePath, std::uint8_t bitsPerPixel)
 {
     setBitsPerPixel(bitsPerPixel);
 
@@ -159,7 +159,7 @@ void steganographyLib::Steganography::extract(const std::string &sourceBitmapFil
 
     // the first 16 bits of encoded data indicate the number of data bytes encoded in the file
     // so that the extract operation knows when to stop decoding bytes
-    uint16_t dataFileSize;
+    std::uint16_t dataFileSize;
     vector<char> sourceFileSizeBytes(sizeof(dataFileSize));
     sourceFileSizeBytes[0] = decodeByte(); // 8 least significant bytes of the file size
     sourceFileSizeBytes[1] = decodeByte(); // 8 most significant bytes of the file size
@@ -238,7 +238,7 @@ void steganographyLib::Steganography::encodeByte(const char inputByte)
     for (int inputByteBitEncodingPos = 0; inputByteBitEncodingPos < 8; inputByteBitEncodingPos++)
     {
         // isolate the bit we are trying to encode on the LSB position of a byte
-        uint8_t inputByteBit = LSB_BYTE_MASK & (inputByte >> inputByteBitEncodingPos);
+        std::uint8_t inputByteBit = LSB_BYTE_MASK & (inputByte >> inputByteBitEncodingPos);
 
         // encode the bit at the encoding position
         // we encode bits starting at the least significant bit positions to ensure we shift
@@ -267,13 +267,13 @@ void steganographyLib::Steganography::encodeByte(const char inputByte)
     }
 }
 
-uint8_t steganographyLib::Steganography::decodeByte()
+std::uint8_t steganographyLib::Steganography::decodeByte()
 {
-    uint8_t dataByte = 0x00;
+    std::uint8_t dataByte = 0x00;
 
     for (int dataByteBitPos = 0; dataByteBitPos < 8; dataByteBitPos++)
     {
-        uint8_t mask = LSB_BYTE_MASK << m_pixelBitEncodingPos;
+        std::uint8_t mask = LSB_BYTE_MASK << m_pixelBitEncodingPos;
         if (*m_pPixel & mask)
         {
             dataByte |= LSB_BYTE_MASK << dataByteBitPos;
