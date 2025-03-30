@@ -14,7 +14,8 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest] # we build on GitHub-provided Windows and Linux images
+        os: [ubuntu-latest, windows-latest, macos-latest] # we build on GitHub-provided Windows, Linux and MacOS images
+        # documentation of preinstalled software available at: https://docs.github.com/en/actions/writing-workflows/choosing-where-your-workflow-runs/choosing-the-runner-for-a-job#standard-github-hosted-runners-for-public-repositories
     runs-on: ${{ matrix.os }} # use value from the matrix
     steps:
     - uses: actions/checkout@v4
