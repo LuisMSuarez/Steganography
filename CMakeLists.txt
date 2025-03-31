@@ -11,6 +11,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(LIB_SOURCES
     steganography.cpp steganography.h
     isteganography.h bitmap.h
+    program_wrapper.cpp program_wrapper.h
 )
 
 # Create a static library for the core logic

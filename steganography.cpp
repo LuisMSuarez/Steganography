@@ -11,16 +11,16 @@
 using namespace std;
 using namespace bmp;
 
-steganographyLib::Steganography::Steganography() noexcept
+SteganographyLib::Steganography::Steganography() noexcept
 {
     m_progressCallback = nullptr;
 }
 
-steganographyLib::Steganography::~Steganography() noexcept
+SteganographyLib::Steganography::~Steganography() noexcept
 {
 }
 
-void steganographyLib::Steganography::embed(const std::string &originalBitmapFilePath, const std::string &sourceDataFilePath, const std::string &destinationBitmapDataFilePath, std::uint8_t bitsPerPixel)
+void SteganographyLib::Steganography::embed(const std::string &originalBitmapFilePath, const std::string &sourceDataFilePath, const std::string &destinationBitmapDataFilePath, std::uint8_t bitsPerPixel)
 {
     setBitsPerPixel(bitsPerPixel);
 
@@ -120,7 +120,7 @@ void steganographyLib::Steganography::embed(const std::string &originalBitmapFil
     m_sourceBitmap.save(destinationBitmapDataFilePath);
 }
 
-void steganographyLib::Steganography::extract(const std::string &sourceBitmapFilePath, const std::string &destinationDataFilePath, std::uint8_t bitsPerPixel)
+void SteganographyLib::Steganography::extract(const std::string &sourceBitmapFilePath, const std::string &destinationDataFilePath, std::uint8_t bitsPerPixel)
 {
     setBitsPerPixel(bitsPerPixel);
 
@@ -214,7 +214,7 @@ void steganographyLib::Steganography::extract(const std::string &sourceBitmapFil
     destinationDataFileStream.close();
 }
 
-void steganographyLib::Steganography::registerProgressCallback(ProgressCallback callbackFunction, int percentGrain)
+void SteganographyLib::Steganography::registerProgressCallback(ProgressCallback callbackFunction, int percentGrain)
 {
     if (callbackFunction == nullptr)
     {
@@ -231,7 +231,7 @@ void steganographyLib::Steganography::registerProgressCallback(ProgressCallback 
     m_progressCallbackPercentGrain = percentGrain;
 }
 
-void steganographyLib::Steganography::encodeByte(const char inputByte)
+void SteganographyLib::Steganography::encodeByte(const char inputByte)
 {
     // loop with an index to the bit (0 to 7) that is being encoded from the data file byte
     // encoding from least significant bit to most significant bit
@@ -267,7 +267,7 @@ void steganographyLib::Steganography::encodeByte(const char inputByte)
     }
 }
 
-std::uint8_t steganographyLib::Steganography::decodeByte()
+std::uint8_t SteganographyLib::Steganography::decodeByte()
 {
     std::uint8_t dataByte = 0x00;
 
@@ -289,7 +289,7 @@ std::uint8_t steganographyLib::Steganography::decodeByte()
     return dataByte;
 }
 
-void steganographyLib::Steganography::nextBitmapByte()
+void SteganographyLib::Steganography::nextBitmapByte()
 {
     switch(m_currentPixelColor)
     {
@@ -318,7 +318,7 @@ void steganographyLib::Steganography::nextBitmapByte()
     m_pixelBitEncodingPos = 0;
 }
 
-void steganographyLib::Steganography::setBitsPerPixel(int bitsPerPixel)
+void SteganographyLib::Steganography::setBitsPerPixel(int bitsPerPixel)
 {
     // Before manipulating files, verify that bitsPerPixel is a number between 3 and 24 and a multiple of 3.
     // this number represents how many bits of information from the input file we will pack into each 24-bit RGB pixel.

@@ -2,9 +2,9 @@
 #include <filesystem>
 #include "../steganography.h"
 
-using namespace steganographyLib;
+using namespace SteganographyLib;
 
-TEST(SteganographyTest, EmbedValidText_NoCallback) {
+TEST(SteganographyTests, EmbedValidText_NoCallback) {
     Steganography steg;
     std::string sourceDataFilePath = "../../../data/sampleInput.txt";
     std::string originalBitmapFilePath = "../../../data/sample.bmp";
@@ -33,7 +33,7 @@ void EmbedValidText_Callback_testCallback(int progressPercentage)
    embedValidText_Callback_invoked = true;
 }
 
-TEST(SteganographyTest, EmbedValidText_Callback) {
+TEST(SteganographyTests, EmbedValidText_Callback) {
     Steganography steg;
     std::string sourceDataFilePath = "../../../data/sampleInput.txt";
     std::string originalBitmapFilePath = "../../../data/sample.bmp";
@@ -62,7 +62,7 @@ TEST(SteganographyTest, EmbedValidText_Callback) {
     std::filesystem::remove(destinationDataFilePath);
 }
 
-TEST(SteganographyTest, ExtractValidBitmap_NoCallback) {
+TEST(SteganographyTests, ExtractValidBitmap_NoCallback) {
     Steganography steg;
     std::string sourceBitmapFilePath = "../../../data/embedded_6bits.bmp";
     std::string destinationDataFilePath = "output_data.txt";
@@ -87,7 +87,7 @@ void ExtractValidBitmap_Callback_testCallback(int progressPercentage)
    extractValidBitmap_Callback_invoked = true;
 }
 
-TEST(SteganographyTest, ExtractValidBitmap_Callback) {
+TEST(SteganographyTests, ExtractValidBitmap_Callback) {
     Steganography steg;
     std::string sourceBitmapFilePath = "../../../data/embedded_6bits.bmp";
     std::string destinationDataFilePath = "output_data.txt";
@@ -112,7 +112,7 @@ TEST(SteganographyTest, ExtractValidBitmap_Callback) {
     std::filesystem::remove(destinationDataFilePath);
 }
 
-TEST(SteganographyTest, ExtractInvalidBitmapPath) {
+TEST(SteganographyTests, ExtractInvalidBitmapPath) {
     Steganography steg;
     std::string sourceBitmapFilePath = "nonexistent_bitmap.bmp";
     std::string destinationDataFilePath = "output_data.txt";
@@ -122,7 +122,7 @@ TEST(SteganographyTest, ExtractInvalidBitmapPath) {
     EXPECT_THROW(steg.extract(sourceBitmapFilePath, destinationDataFilePath, bitsPerPixel), std::runtime_error);
 }
 
-TEST(SteganographyTest, ExtractInvalidBitsPerPixel) {
+TEST(SteganographyTests, ExtractInvalidBitsPerPixel) {
     Steganography steg;
     std::string sourceBitmapFilePath = "../../../data/embedded_6bits.bmp";
     std::string destinationDataFilePath = "output_data.txt";
@@ -133,9 +133,4 @@ TEST(SteganographyTest, ExtractInvalidBitsPerPixel) {
 
     // Call the extract method and expect an exception
     EXPECT_THROW(steg.extract(sourceBitmapFilePath, destinationDataFilePath, invalidBitsPerPixel), std::runtime_error);
-}
-
-int main(int argc, char **argv) {
-    ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
 }
