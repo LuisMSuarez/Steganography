@@ -17,9 +17,11 @@ void percentageProgressCallback(int progressPercentage)
     cout << "Percent complete: " << progressPercentage << "\n";
 }
 
+// By extracting the logic of the main() function into a wrapper, we can make it testable
+// without causing collision with the main() function from the test harness of choice.
 int SteganographyLib::mainWrapper(int argc, char* argv[])
 {
-    const string usage = "steganography embed bitmapPath sourceData destinationBitmap bitsPerPixel |\nsteganography extract bitmapPath destinationFile bitsPerPixel";
+    const string usage = "steganography embed bitmapPath sourceData destinationBitmap bitsPerPixel |\nsteganography extract bitmapPath destinationFile bitsPerPixel\n";
 
     auto returnCode = SteganographyLib::SUCCESS;
 
@@ -31,14 +33,14 @@ int SteganographyLib::mainWrapper(int argc, char* argv[])
     // Command line parsing
     if (argc < 2)
     {
-        cout << "Invalid argument count\n" << usage;
+        cerr << "Invalid argument count\n" << usage;
         returnCode = ERROR_CODE_INVALID_ARGUMENTS;
     }
     else if (string(argv[1]).compare("embed") == 0)
     {
         if (argc != 6)
         {
-            cout << "Invalid argument count for embed operation\n" << usage;
+            cerr << "Invalid argument count for embed operation\n" << usage;
             returnCode = ERROR_CODE_INVALID_ARGUMENTS;
         }
         else
@@ -51,7 +53,7 @@ int SteganographyLib::mainWrapper(int argc, char* argv[])
     {
         if (argc != 5)
         {
-            cout << "Invalid argument count for extract operation\n" << usage;
+            cerr << "Invalid argument count for extract operation\n" << usage;
             returnCode = ERROR_CODE_INVALID_ARGUMENTS;
         }
         else
@@ -62,7 +64,7 @@ int SteganographyLib::mainWrapper(int argc, char* argv[])
     }
     else
     {
-        cout << "Invalid operation'" << argv[1] << "'.\n" << usage;
+        cerr << "Invalid operation'" << argv[1] << "'.\n" << usage;
         returnCode = ERROR_CODE_INVALID_OPERATION;
     }
 
