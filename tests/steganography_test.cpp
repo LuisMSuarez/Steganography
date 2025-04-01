@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include <filesystem>
 #include "../steganography.h"
+#include "../program_wrapper.h"
 
 using namespace SteganographyLib;
 

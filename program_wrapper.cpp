@@ -19,26 +19,20 @@ void percentageProgressCallback(int progressPercentage)
 
 int SteganographyLib::mainWrapper(int argc, char* argv[])
 {
-    const int errorCodeInvalidArguments = 1;
-    const int ERROR_CODE_INVALID_OPERATION = 2;
     const string usage = "steganography embed bitmapPath sourceData destinationBitmap bitsPerPixel |\nsteganography extract bitmapPath destinationFile bitsPerPixel";
 
-    auto returnCode = 0; // success
+    auto returnCode = SteganographyLib::SUCCESS;
 
     // Apply dependency inversion principle by taking dependency on abstractions, not concretions.
     SteganographyLib::ISteganography *steg = new SteganographyLib::Steganography();
 
-    steg->registerProgressCallback(
-        [](int num) -> void
-        {
-            return percentageProgressCallback(num);
-        }, /* percentGrain */ 10);
+    steg->registerProgressCallback(percentageProgressCallback, /* percentGrain */ 10);
 
     // Command line parsing
     if (argc < 2)
     {
         cout << "Invalid argument count\n" << usage;
-        returnCode = errorCodeInvalidArguments;
+        returnCode = ERROR_CODE_INVALID_ARGUMENTS;
     }
     else if (string(argv[1]).compare("embed") == 0)
     {
