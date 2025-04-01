@@ -4,7 +4,7 @@
 #include <functional> // std::function
 #include <string>     // std::string
 
-namespace steganographyLib
+namespace SteganographyLib
 {
     /// @brief Callback function that will be invoked during the embed and extract methods to notify the caller of the progress of these operations.
     /// @param int The percentage of the operation that has been completed.

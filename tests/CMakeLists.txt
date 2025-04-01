@@ -23,6 +23,7 @@ FetchContent_MakeAvailable(googletest)
 # Add test executable
 set(TEST_SOURCES
     steganography_test.cpp
+    program_test.cpp
 )
 
 add_executable(SteganographyTests ${TEST_SOURCES})

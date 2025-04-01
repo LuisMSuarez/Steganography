@@ -6,7 +6,7 @@
 #include "isteganography.h"
 #include "bitmap.h"
 
-namespace steganographyLib
+namespace SteganographyLib
 {
     enum PixelColor
     {
